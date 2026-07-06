@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xilófono Online — Toca el Xilófono Virtual Gratis con Todas las Notas</title>
+<meta name="description" content="Toca el xilófono online gratis desde tu navegador. Xilófono virtual interactivo con todas las notas (Do, Re, Mi…), sonido real, teclado y canciones fáciles para aprender.">
+<link rel="canonical" href="https://xilofono-online.com/">
+<meta property="og:title" content="Xilófono Online — Toca el Xilófono Virtual Gratis">
+<meta property="og:description" content="Xilófono virtual interactivo con todas las notas. Toca con el ratón, el dedo o el teclado. Gratis y sin descargas.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Karla:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3F5F1;
+    --ink:#22303A;
+    --ink-soft:#54646F;
+    --rail:#A97C52;
+    --rail-dark:#8A6240;
+    --card:#FFFFFF;
+    --line:#DDE3DC;
+    --c1:#E4553F; --c2:#F08A24; --c3:#F2C037; --c4:#7FB847;
+    --c5:#3FA8C9; --c6:#4767C8; --c7:#8A5BC1; --c8:#D8548F;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Karla',system-ui,sans-serif;
+    font-size:17px;
+    line-height:1.65;
+  }
+  h1,h2,h3{font-family:'Fredoka',sans-serif;font-weight:600;line-height:1.15;letter-spacing:-.01em}
+  a{color:var(--c6)}
+
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px}
+
+  header.top{padding:28px 0 8px;display:flex;align-items:center;gap:10px}
+  .logo{display:flex;gap:4px;align-items:flex-end;height:26px}
+  .logo span{width:7px;border-radius:3px;display:block}
+  .logo span:nth-child(1){height:26px;background:var(--c1)}
+  .logo span:nth-child(2){height:21px;background:var(--c3)}
+  .logo span:nth-child(3){height:17px;background:var(--c4)}
+  .logo span:nth-child(4){height:13px;background:var(--c5)}
+  .brand{font-family:'Fredoka',sans-serif;font-weight:600;font-size:1.05rem}
+
+  .hero{text-align:center;padding:34px 0 10px}
+  .hero h1{font-size:clamp(2.1rem,6vw,3.3rem)}
+  .hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--c1),var(--c2),var(--c4),var(--c5),var(--c7));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{max-width:560px;margin:14px auto 0;color:var(--ink-soft);font-size:1.05rem}
+
+  /* ============ instrument ============ */
+  .stage{margin:34px 0 8px}
+  .frame{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:clamp(18px,4vw,40px) clamp(14px,3vw,34px);
+    box-shadow:0 14px 34px rgba(34,48,58,.08);
+  }
+  .rails{position:absolute;left:6%;right:6%;top:0;bottom:0;pointer-events:none}
+  .rails::before,.rails::after{
+    content:"";position:absolute;left:0;right:0;height:16px;border-radius:8px;
+    background:linear-gradient(180deg,var(--rail),var(--rail-dark));
+    box-shadow:0 3px 6px rgba(0,0,0,.15);
+  }
+  .rails::before{top:28%}
+  .rails::after{bottom:22%}
+  .bars{
+    position:relative;
+    display:flex;justify-content:center;align-items:center;
+    gap:clamp(6px,1.6vw,14px);
+  }
+  .bar{
+    --h:220px;
+    width:clamp(30px,9vw,64px);
+    height:calc(var(--h) * var(--scale,1));
+    border:none;border-radius:999px;
+    background:var(--col);
+    color:#fff;
+    font-family:'Fredoka',sans-serif;font-weight:600;
+    font-size:clamp(.8rem,2.4vw,1.05rem);
+    display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+    padding-bottom:14px;gap:2px;
+    cursor:pointer;
+    position:relative;
+    box-shadow:inset 0 -6px 0 rgba(0,0,0,.18), inset 0 3px 0 rgba(255,255,255,.28), 0 6px 12px rgba(34,48,58,.18);
+    transition:transform .08s ease, filter .08s ease;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .bar::before,.bar::after{
+    content:"";position:absolute;left:50%;transform:translateX(-50%);
+    width:9px;height:9px;border-radius:50%;
+    background:rgba(0,0,0,.22);
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.25);
+  }
+  .bar::before{top:12%}
+  .bar::after{bottom:26%}
+  .bar .key{font-size:.68rem;opacity:.75;font-family:'Karla',sans-serif;font-weight:700;letter-spacing:.05em}
+  .bar:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+  .bar.hit{transform:translateY(4px) scaleY(.985);filter:brightness(1.25) saturate(1.2)}
+  .bar.glow{filter:brightness(1.3);box-shadow:0 0 0 4px rgba(34,48,58,.15), inset 0 -6px 0 rgba(0,0,0,.18)}
+
+  .controls{
+    display:flex;flex-wrap:wrap;gap:10px;justify-content:center;
+    padding:18px 0 6px;
+  }
+  .chip{
+    border:1px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:999px;padding:8px 16px;font-family:'Karla',sans-serif;
+    font-weight:700;font-size:.9rem;cursor:pointer;transition:background .15s;
+  }
+  .chip:hover{background:#EDF1EA}
+  .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .hint{text-align:center;color:var(--ink-soft);font-size:.9rem;padding-bottom:8px}
+  .hint kbd{
+    background:var(--card);border:1px solid var(--line);border-bottom-width:2px;
+    border-radius:6px;padding:1px 7px;font-size:.8rem;font-family:'Karla',sans-serif;font-weight:700;
+  }
+
+  section{padding:38px 0}
+  section h2{font-size:clamp(1.5rem,4vw,2rem);margin-bottom:14px}
+  section p{margin-bottom:14px;color:#33424C}
+  section p:last-child{margin-bottom:0}
+
+  .songs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:8px}
+  .song{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px;display:flex;flex-direction:column;gap:10px;
+  }
+  .song h3{font-size:1.1rem}
+  .song .notes{font-size:.88rem;color:var(--ink-soft);line-height:1.5}
+  .song .notes b{color:var(--ink)}
+  .play{
+    align-self:flex-start;margin-top:auto;
+    border:none;border-radius:999px;padding:8px 18px;
+    background:var(--ink);color:#fff;font-family:'Fredoka',sans-serif;font-weight:600;
+    font-size:.9rem;cursor:pointer;
+  }
+  .play:hover{background:#33424C}
+  .play[disabled]{opacity:.5;cursor:default}
+
+  .faq details{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:14px 18px;margin-bottom:10px;
+  }
+  .faq summary{font-family:'Fredoka',sans-serif;font-weight:600;cursor:pointer;font-size:1.02rem}
+  .faq details p{margin:10px 0 0}
+
+  footer{
+    border-top:1px solid var(--line);padding:26px 0 40px;margin-top:20px;
+    color:var(--ink-soft);font-size:.9rem;text-align:center;
+  }
+
+  @media (max-width:560px){
+    .bar{--h:160px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .bar{transition:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="top wrap">
+  <div class="logo" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  <div class="brand">Xilófono Online</div>
+</header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <h1>Toca el <em>xilófono online</em>, gratis y sin descargas</h1>
+    <p>Un xilófono virtual con todas las notas. Toca con el ratón, con el dedo en el móvil o con tu teclado, y aprende canciones fáciles nota a nota.</p>
+  </div>
+
+  <div class="stage" id="tocar">
+    <div class="frame">
+      <div class="rails" aria-hidden="true"></div>
+      <div class="bars" id="bars" role="group" aria-label="Xilófono interactivo de 8 notas"></div>
+    </div>
+    <div class="controls">
+      <button class="chip" id="toggleNames" aria-pressed="false">Notación: Do Re Mi</button>
+      <button class="chip" id="toggleKeys" aria-pressed="true">Mostrar teclas</button>
+    </div>
+    <p class="hint">También puedes tocar con el teclado: <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>G</kbd> <kbd>H</kbd> <kbd>J</kbd> <kbd>K</kbd></p>
+  </div>
+
+  <section id="canciones">
+    <h2>Canciones fáciles para xilófono</h2>
+    <p>Empieza con estas melodías populares. Pulsa «Escuchar» para ver cómo se iluminan las notas en el xilófono y después intenta repetirlas tú.</p>
+    <div class="songs" id="songs"></div>
+  </section>
+
+  <section id="que-es">
+    <h2>¿Qué es un xilófono online?</h2>
+    <p>Un xilófono online es un instrumento musical virtual que reproduce el sonido y el funcionamiento de un xilófono real directamente en el navegador. Cada lámina de color corresponde a una nota musical: las láminas más largas producen sonidos graves y las más cortas, sonidos agudos, exactamente igual que en el instrumento de percusión original.</p>
+    <p>Esta versión utiliza síntesis de audio en tiempo real para imitar el timbre brillante y percusivo del xilófono de madera. No necesitas instalar nada ni crear una cuenta: funciona en ordenadores, tablets y móviles.</p>
+  </section>
+
+  <section id="como-tocar">
+    <h2>Cómo tocar el xilófono virtual</h2>
+    <p>Hay tres formas de hacer sonar las láminas: haciendo clic con el ratón, tocando la pantalla en dispositivos táctiles, o usando las teclas de la fila central del teclado (de la A a la K). Cada lámina muestra su nota en solfeo (Do, Re, Mi, Fa, Sol, La, Si, Do) o en notación anglosajona (C, D, E, F, G, A, B, C), según la opción que elijas.</p>
+    <p>Un buen ejercicio para empezar es tocar la escala completa de grave a agudo y de agudo a grave, primero despacio y luego cada vez más rápido. Después, prueba las canciones guiadas: el xilófono ilumina cada nota en orden para que puedas seguir la melodía.</p>
+  </section>
+
+  <section id="notas">
+    <h2>Las notas del xilófono</h2>
+    <p>Este xilófono virtual incluye una octava completa en la escala de Do mayor, la misma afinación que la mayoría de xilófonos infantiles y escolares de 8 láminas. De grave a agudo, las notas son: <strong>Do (C5), Re (D5), Mi (E5), Fa (F5), Sol (G5), La (A5), Si (B5) y Do agudo (C6)</strong>.</p>
+    <p>Con una octava en Do mayor se pueden tocar muchísimas melodías populares e infantiles, y es el rango ideal para dar los primeros pasos en educación musical: reconocer notas, trabajar el oído y practicar secuencias rítmicas sencillas.</p>
+  </section>
+
+  <section class="faq" id="faq">
+    <h2>Preguntas frecuentes</h2>
+    <details>
+      <summary>¿El xilófono online es gratis?</summary>
+      <p>Sí, es completamente gratuito. No requiere registro, descargas ni instalación: se toca directamente desde el navegador.</p>
+    </details>
+    <details>
+      <summary>¿Funciona en el móvil?</summary>
+      <p>Sí. El xilófono es táctil y se adapta a pantallas pequeñas. En móviles y tablets basta con tocar las láminas con el dedo. Recuerda quitar el modo silencio para escuchar el sonido.</p>
+    </details>
+    <details>
+      <summary>¿Qué notas tiene este xilófono virtual?</summary>
+      <p>Incluye las 8 notas de la escala de Do mayor: Do, Re, Mi, Fa, Sol, La, Si y Do agudo, la misma disposición que un xilófono escolar de 8 láminas.</p>
+    </details>
+    <details>
+      <summary>¿Puedo usarlo en clase de música?</summary>
+      <p>Por supuesto. Es un recurso pensado también para docentes: funciona en pizarras digitales y ordenadores de aula, y las canciones guiadas ayudan al alumnado a seguir las melodías nota a nota.</p>
+    </details>
+    <details>
+      <summary>¿Xilófono se escribe con X o con S?</summary>
+      <p>La forma correcta en español es «xilófono», con X, del griego <em>xylon</em> (madera) y <em>phōnē</em> (sonido). Aun así, es habitual verlo escrito como «silofono» o «xilofono» sin tilde en las búsquedas.</p>
+    </details>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">Xilófono Online · Un instrumento virtual gratuito para jugar y aprender música.</div>
+</footer>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Xilófono Online",
+      "url": "https://xilofono-online.com/",
+      "applicationCategory": "MusicApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "es",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "description": "Xilófono virtual gratuito para tocar online con todas las notas de la escala de Do mayor."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type":"Question","name":"¿El xilófono online es gratis?","acceptedAnswer":{"@type":"Answer","text":"Sí, es completamente gratuito. No requiere registro, descargas ni instalación."}},
+        {"@type":"Question","name":"¿Funciona en el móvil?","acceptedAnswer":{"@type":"Answer","text":"Sí, el xilófono es táctil y se adapta a pantallas pequeñas de móviles y tablets."}},
+        {"@type":"Question","name":"¿Qué notas tiene este xilófono virtual?","acceptedAnswer":{"@type":"Answer","text":"Incluye las 8 notas de la escala de Do mayor: Do, Re, Mi, Fa, Sol, La, Si y Do agudo."}},
+        {"@type":"Question","name":"¿Puedo usarlo en clase de música?","acceptedAnswer":{"@type":"Answer","text":"Sí, funciona en pizarras digitales y ordenadores de aula, con canciones guiadas para el alumnado."}}
+      ]
+    }
+  ]
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  var NOTES = [
+    {sol:"Do",  eng:"C5", f:523.25, col:"var(--c1)", key:"A", h:1.00},
+    {sol:"Re",  eng:"D5", f:587.33, col:"var(--c2)", key:"S", h:0.94},
+    {sol:"Mi",  eng:"E5", f:659.25, col:"var(--c3)", key:"D", h:0.88},
+    {sol:"Fa",  eng:"F5", f:698.46, col:"var(--c4)", key:"F", h:0.82},
+    {sol:"Sol", eng:"G5", f:783.99, col:"var(--c5)", key:"G", h:0.76},
+    {sol:"La",  eng:"A5", f:880.00, col:"var(--c6)", key:"H", h:0.70},
+    {sol:"Si",  eng:"B5", f:987.77, col:"var(--c7)", key:"J", h:0.64},
+    {sol:"Do'", eng:"C6", f:1046.50,col:"var(--c8)", key:"K", h:0.58}
+  ];
+
+  var SONGS = [
+    {name:"Estrellita, ¿dónde estás?", seq:[1,1,5,5,6,6,5, 4,4,3,3,2,2,1], bpm:170,
+     label:"Do Do Sol Sol La La Sol · Fa Fa Mi Mi Re Re Do"},
+    {name:"Martinillo (Frère Jacques)", seq:[1,2,3,1, 1,2,3,1, 3,4,5, 3,4,5], bpm:190,
+     label:"Do Re Mi Do · Do Re Mi Do · Mi Fa Sol · Mi Fa Sol"},
+    {name:"Himno de la Alegría", seq:[3,3,4,5, 5,4,3,2, 1,1,2,3, 3,2,2], bpm:200,
+     label:"Mi Mi Fa Sol · Sol Fa Mi Re · Do Do Re Mi · Mi Re Re"}
+  ];
+
+  var ctx = null;
+  function audio(){
+    if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if(ctx.state === "suspended") ctx.resume();
+    return ctx;
+  }
+
+  // Xylophone-ish synthesis: fundamental + tuned overtone (3f) + bright click, fast decay
+  function strike(freq){
+    var ac = audio(), t = ac.currentTime;
+    var out = ac.createGain();
+    out.gain.setValueAtTime(0.5, t);
+    out.connect(ac.destination);
+
+    [[1, 1.0, 0.9], [3, 0.35, 0.35], [6.3, 0.12, 0.12]].forEach(function(p){
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq * p[0], t);
+      g.gain.setValueAtTime(p[1], t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + p[2]);
+      o.connect(g); g.connect(out);
+      o.start(t); o.stop(t + p[2] + 0.05);
+    });
+
+    // mallet click
+    var len = ac.sampleRate * 0.02;
+    var buf = ac.createBuffer(1, len, ac.sampleRate);
+    var d = buf.getChannelData(0);
+    for(var i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len);
+    var n = ac.createBufferSource(), ng = ac.createGain(), hp = ac.createBiquadFilter();
+    hp.type="highpass"; hp.frequency.value = 2000;
+    ng.gain.setValueAtTime(0.25, t);
+    n.buffer = buf; n.connect(hp); hp.connect(ng); ng.connect(out);
+    n.start(t);
+  }
+
+  var barsEl = document.getElementById("bars");
+  var barEls = [];
+  var useEnglish = false, showKeys = true;
+
+  NOTES.forEach(function(note, i){
+    var b = document.createElement("button");
+    b.className = "bar";
+    b.style.setProperty("--col", note.col);
+    b.style.setProperty("--scale", note.h);
+    b.setAttribute("aria-label", "Nota " + note.sol + " (" + note.eng + ")");
+    b.innerHTML = '<span class="name"></span><span class="key"></span>';
+    b.addEventListener("pointerdown", function(e){ e.preventDefault(); play(i); });
+    b.addEventListener("keydown", function(e){
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); play(i); }
+    });
+    barsEl.appendChild(b);
+    barEls.push(b);
+  });
+
+  function labels(){
+    NOTES.forEach(function(note, i){
+      barEls[i].querySelector(".name").textContent = useEnglish ? note.eng : note.sol;
+      barEls[i].querySelector(".key").textContent = showKeys ? note.key : "";
+    });
+  }
+  labels();
+
+  function play(i){
+    strike(NOTES[i].f);
+    var b = barEls[i];
+    b.classList.remove("hit");
+    void b.offsetWidth;
+    b.classList.add("hit");
+    setTimeout(function(){ b.classList.remove("hit"); }, 130);
+  }
+
+  // keyboard
+  var keymap = {};
+  NOTES.forEach(function(n,i){ keymap[n.key.toLowerCase()] = i; });
+  document.addEventListener("keydown", function(e){
+    if(e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+    var tag = document.activeElement && document.activeElement.tagName;
+    if(tag === "INPUT" || tag === "TEXTAREA") return;
+    var i = keymap[e.key.toLowerCase()];
+    if(i !== undefined) play(i);
+  });
+
+  // toggles
+  var tn = document.getElementById("toggleNames");
+  tn.addEventListener("click", function(){
+    useEnglish = !useEnglish;
+    tn.setAttribute("aria-pressed", String(useEnglish));
+    tn.textContent = useEnglish ? "Notación: C D E" : "Notación: Do Re Mi";
+    labels();
+  });
+  var tk = document.getElementById("toggleKeys");
+  tk.addEventListener("click", function(){
+    showKeys = !showKeys;
+    tk.setAttribute("aria-pressed", String(showKeys));
+    labels();
+  });
+
+  // songs
+  var songsEl = document.getElementById("songs");
+  var playing = false;
+  SONGS.forEach(function(song){
+    var card = document.createElement("div");
+    card.className = "song";
+    card.innerHTML = '<h3>' + song.name + '</h3>' +
+      '<p class="notes"><b>Notas:</b> ' + song.label + '</p>' +
+      '<button class="play">▶ Escuchar</button>';
+    var btn = card.querySelector(".play");
+    btn.addEventListener("click", function(){
+      if(playing) return;
+      playing = true;
+      document.querySelectorAll(".play").forEach(function(b){ b.disabled = true; });
+      audio();
+      var beat = 60000 / song.bpm;
+      song.seq.forEach(function(deg, idx){
+        setTimeout(function(){
+          var i = deg - 1;
+          play(i);
+          barEls[i].classList.add("glow");
+          setTimeout(function(){ barEls[i].classList.remove("glow"); }, beat * 0.8);
+          if(idx === song.seq.length - 1){
+            setTimeout(function(){
+              playing = false;
+              document.querySelectorAll(".play").forEach(function(b){ b.disabled = false; });
+            }, beat);
+          }
+        }, idx * beat);
+      });
+    });
+    songsEl.appendChild(card);
+  });
+})();
+</script>
+</body>
+</html>
