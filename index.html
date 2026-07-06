@@ -150,6 +150,16 @@
   .play:hover{background:#33424C}
   .play[disabled]{opacity:.5;cursor:default}
 
+  .download{
+    display:inline-block;margin-top:4px;
+    background:var(--ink);color:#fff;text-decoration:none;
+    border-radius:999px;padding:12px 26px;
+    font-family:'Fredoka',sans-serif;font-weight:600;font-size:1rem;
+    box-shadow:0 6px 14px rgba(34,48,58,.2);
+    transition:background .15s;
+  }
+  .download:hover{background:#33424C}
+
   .faq details{
     background:var(--card);border:1px solid var(--line);border-radius:14px;
     padding:14px 18px;margin-bottom:10px;
@@ -201,6 +211,12 @@
     <h2>Canciones fáciles para xilófono</h2>
     <p>Empieza con estas melodías populares. Pulsa «Escuchar» para ver cómo se iluminan las notas en el xilófono y después intenta repetirlas tú.</p>
     <div class="songs" id="songs"></div>
+  </section>
+
+  <section id="descargar">
+    <h2>Descarga las canciones para imprimir</h2>
+    <p>¿Prefieres practicar en papel o repartir las melodías en clase? Descarga gratis el PDF <strong>«10 canciones fáciles para xilófono»</strong>: incluye estas canciones y más, escritas con notas de colores para xilófonos de 8 láminas, listas para imprimir y usar en casa o en el aula.</p>
+    <a class="download" href="/canciones-faciles-para-xilofono.pdf" download>⬇ Descargar el PDF gratis</a>
   </section>
 
   <section id="que-es">
