@@ -83,7 +83,20 @@
     border-radius:12px;
     color:#fff;font-family:'Fredoka',sans-serif;font-weight:600;font-size:.88rem;
     box-shadow:inset 0 -4px 0 rgba(0,0,0,.16), inset 0 2px 0 rgba(255,255,255,.25);
+    transition:transform .1s ease, filter .1s ease;
   }
+  .chip.glow{
+    filter:brightness(1.28) saturate(1.2);
+    transform:translateY(-3px) scale(1.08);
+  }
+  .play{
+    margin-top:14px;
+    border:none;border-radius:999px;padding:8px 18px;
+    background:var(--ink);color:#fff;font-family:'Fredoka',sans-serif;font-weight:600;
+    font-size:.9rem;cursor:pointer;
+  }
+  .play:hover{background:#33424C}
+  .play[disabled]{opacity:.5;cursor:default}
   .c1{background:var(--c1)}.c2{background:var(--c2)}.c3{background:var(--c3)}.c4{background:var(--c4)}
   .c5{background:var(--c5)}.c6{background:var(--c6)}.c7{background:var(--c7)}.c8{background:var(--c8)}
 
@@ -112,7 +125,7 @@
     border-top:1px solid var(--line);padding:26px 0 40px;margin-top:20px;
     color:var(--ink-soft);font-size:.9rem;text-align:center;
   }
-  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.chip{transition:none}}
 </style>
 </head>
 <body>
@@ -286,6 +299,99 @@
     {"@type":"ListItem","position":10,"name":"Cumpleaños feliz","url":"https://xilofono-online.com/canciones-faciles-para-xilofono/#cumpleanos-feliz"}
   ]
 }
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  var FREQ = {
+    "Do":523.25, "Re":587.33, "Mi":659.25, "Fa":698.46,
+    "Sol":783.99, "La":880.00, "Si":987.77, "Do'":1046.50
+  };
+  var BEAT = 60000 / 190;
+
+  var ctx = null;
+  function audio(){
+    if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if(ctx.state === "suspended") ctx.resume();
+    return ctx;
+  }
+
+  // Same xylophone synthesis as the home page instrument
+  function strike(freq){
+    var ac = audio(), t = ac.currentTime;
+    var out = ac.createGain();
+    out.gain.setValueAtTime(0.5, t);
+    out.connect(ac.destination);
+
+    [[1, 1.0, 0.9], [3, 0.35, 0.35], [6.3, 0.12, 0.12]].forEach(function(p){
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq * p[0], t);
+      g.gain.setValueAtTime(p[1], t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + p[2]);
+      o.connect(g); g.connect(out);
+      o.start(t); o.stop(t + p[2] + 0.05);
+    });
+
+    var len = ac.sampleRate * 0.02;
+    var buf = ac.createBuffer(1, len, ac.sampleRate);
+    var d = buf.getChannelData(0);
+    for(var i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len);
+    var n = ac.createBufferSource(), ng = ac.createGain(), hp = ac.createBiquadFilter();
+    hp.type="highpass"; hp.frequency.value = 2000;
+    ng.gain.setValueAtTime(0.25, t);
+    n.buffer = buf; n.connect(hp); hp.connect(ng); ng.connect(out);
+    n.start(t);
+  }
+
+  var playing = false;
+
+  document.querySelectorAll(".song-block").forEach(function(block){
+    // Build the sequence from the chips already in the page:
+    // each row of chips, played twice when marked ×2; gaps become one-beat rests
+    var seq = [];
+    block.querySelectorAll(".sheet .row").forEach(function(row){
+      var rowSeq = [];
+      row.childNodes.forEach(function(el){
+        if(el.classList && el.classList.contains("chip")) rowSeq.push(el);
+        else if(el.classList && el.classList.contains("gap")) rowSeq.push(null);
+      });
+      var times = row.querySelector(".rep") ? 2 : 1;
+      for(var r=0;r<times;r++) seq = seq.concat(rowSeq);
+    });
+    if(!seq.length) return;
+
+    var btn = document.createElement("button");
+    btn.className = "play";
+    btn.textContent = "▶ Escuchar";
+    btn.setAttribute("aria-label", "Escuchar la melodía nota a nota");
+    block.appendChild(btn);
+
+    btn.addEventListener("click", function(){
+      if(playing) return;
+      playing = true;
+      document.querySelectorAll(".play").forEach(function(b){ b.disabled = true; });
+      audio();
+      seq.forEach(function(chip, idx){
+        setTimeout(function(){
+          if(chip){
+            strike(FREQ[chip.textContent]);
+            chip.classList.add("glow");
+            setTimeout(function(){ chip.classList.remove("glow"); }, BEAT * 0.7);
+          }
+          if(idx === seq.length - 1){
+            setTimeout(function(){
+              playing = false;
+              document.querySelectorAll(".play").forEach(function(b){ b.disabled = false; });
+            }, BEAT);
+          }
+        }, idx * BEAT);
+      });
+    });
+  });
+})();
 </script>
 </body>
 </html>
