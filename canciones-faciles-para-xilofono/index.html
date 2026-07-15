@@ -118,6 +118,12 @@
   .gap{width:14px}
   .rep{font-size:.85rem;font-weight:700;color:var(--ink-soft);margin-left:4px;white-space:nowrap}
   .song-foot{font-size:.85rem;color:var(--ink-soft);font-style:italic;margin-top:12px}
+  .guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0}
+  .guide-grid a{
+    display:block;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;text-decoration:none;color:var(--ink);font-weight:700;
+  }
+  .guide-grid span{display:block;color:var(--ink-soft);font-weight:400;font-size:.92rem;margin-top:4px}
 
   section.outro{padding:30px 0}
   section.outro h2{font-size:clamp(1.4rem,4vw,1.8rem);margin-bottom:12px}
@@ -156,6 +162,17 @@
       <span class="chip c1">Do</span><span class="chip c2">Re</span><span class="chip c3">Mi</span><span class="chip c4">Fa</span><span class="chip c5">Sol</span><span class="chip c6">La</span><span class="chip c7">Si</span><span class="chip c8">Do'</span>
     </div>
   </div>
+
+  <section class="outro">
+    <h2>Guías paso a paso</h2>
+    <p>Si quieres practicar una canción concreta, estas guías separan las notas, explican los saltos difíciles y enlazan con el xilófono online para probarlas al momento.</p>
+    <div class="guide-grid">
+      <a href="/estrellita-xilofono/">Estrellita en xilófono <span>Notas fáciles con colores para principiantes.</span></a>
+      <a href="/cumpleanos-feliz-xilofono/">Cumpleaños feliz en xilófono <span>Adaptación para 8 láminas en Do mayor.</span></a>
+      <a href="/himno-alegria-xilofono/">Himno de la Alegría en xilófono <span>Melodía reconocible con notas vecinas.</span></a>
+      <a href="/los-pollitos-dicen-xilofono/">Los pollitos dicen en xilófono <span>Canción infantil corta para casa o clase.</span></a>
+    </div>
+  </section>
 
   <article class="song-block" id="estrellita">
     <h2><span class="num">1</span>Estrellita, ¿dónde estás?</h2>
@@ -352,7 +369,7 @@
 
   document.querySelectorAll(".song-block").forEach(function(block){
     // Build the sequence from the chips already in the page:
-    // each row of chips, played twice when marked ×2; gaps become one-beat rests
+    // rows and marked gaps become one-beat rests; rows marked ×2 repeat as written
     var seq = [];
     block.querySelectorAll(".sheet .row").forEach(function(row){
       var rowSeq = [];
@@ -361,7 +378,10 @@
         else if(el.classList && el.classList.contains("gap")) rowSeq.push(null);
       });
       var times = row.querySelector(".rep") ? 2 : 1;
-      for(var r=0;r<times;r++) seq = seq.concat(rowSeq);
+      for(var r=0;r<times;r++){
+        seq = seq.concat(rowSeq);
+        seq.push(null);
+      }
     });
     if(!seq.length) return;
 
