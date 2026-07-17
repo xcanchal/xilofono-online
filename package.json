@@ -1,0 +1,16 @@
+{
+  "name": "xilofono-online",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && node scripts/copy-static-assets.mjs && node scripts/generate-sitemap.mjs",
+    "preview": "astro preview",
+    "test": "node --test test/*.test.mjs",
+    "validate:affiliates": "node scripts/validate-affiliates.mjs",
+    "check": "npm run validate:affiliates && npm test && npm run build && node scripts/verify-build.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.1.1"
+  }
+}
