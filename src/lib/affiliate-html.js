@@ -2,7 +2,7 @@ import { affiliateConfig } from '../../affiliate-config.js';
 import { affiliateProducts } from '../../affiliate-products.js';
 import { assertValidAffiliateProducts, validateAffiliateProducts } from '../../affiliate-validation.js';
 
-const DISCLOSURE = 'Algunos enlaces son de afiliado. Si compras a través de ellos, podemos recibir una comisión sin coste adicional para ti.';
+const DISCLOSURE = 'Enlaces de afiliado.';
 const buildAffiliateConfig = Object.freeze({
   ...affiliateConfig,
   enabled: import.meta.env?.PUBLIC_ENABLE_AFFILIATES === 'true'
@@ -85,7 +85,6 @@ export function renderHomepageAffiliateCta() {
   <h2>¿Quieres seguir practicando fuera de la pantalla?</h2>
   <p>Consulta tres xilófonos recomendados para empezar y tocar las mismas canciones.</p>
   <a class="affiliate-guide-link" href="/mejores-xilofonos-para-ninos/" data-umami-event="affiliate_guide_opened" data-umami-event-source="homepage">Ver xilófonos recomendados</a>
-  ${disclosureHtml()}
 </section>`;
 }
 
