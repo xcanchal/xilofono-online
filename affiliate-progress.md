@@ -40,6 +40,7 @@ This file tracks delivery, launch readiness, evidence, and decisions. The produc
 - [x] Add one secondary homepage CTA
 - [x] Add `affiliate_guide_opened` event
 - [x] Add `affiliate_link_clicked` event
+- [x] Track printable-PDF downloads with `pdf_downloaded`
 - [x] Migrate to Astro static generation; affiliate HTML is build-time rendered
 - [x] Add three verified, active products
 - [ ] Confirm the generated sitemap includes the guide and disclosure at activation
@@ -53,7 +54,7 @@ This file tracks delivery, launch readiness, evidence, and decisions. The produc
 | Deployment / commit | |
 | Feature activated on | |
 | Products active | |
-| Validation command | `npm run check` (passed with 7 tests and Astro build) |
+| Validation command | `npm run check` (passed with 8 tests and Astro build) |
 | Manual QA completed by | |
 
 **Phase 2 decision:** Record guide visits, retailer clicks, merchant purchases, and maintenance effort before progressing.

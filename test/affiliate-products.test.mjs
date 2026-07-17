@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import { affiliateConfig } from '../affiliate-config.js';
@@ -74,4 +75,16 @@ test('statically rendered affiliate links use the required safe attributes', () 
 test('disabled affiliate modules render no commercial HTML', () => {
   assert.equal(renderHomepageAffiliateCta(), '');
   assert.equal(renderBuyingGuideAffiliateProducts(), '');
+});
+
+test('printable PDF downloads record their placement', async () => {
+  const [homepage, songsIndex] = await Promise.all([
+    readFile(new URL('../index.html', import.meta.url), 'utf8'),
+    readFile(new URL('../canciones-faciles-para-xilofono/index.html', import.meta.url), 'utf8')
+  ]);
+
+  assert.match(homepage, /data-umami-event="pdf_downloaded"/);
+  assert.match(homepage, /data-umami-event-placement="homepage"/);
+  assert.match(songsIndex, /data-umami-event="pdf_downloaded"/);
+  assert.match(songsIndex, /data-umami-event-placement="songs-index"/);
 });
