@@ -1,0 +1,26 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import { renderBuyingGuideAffiliateProducts, renderHomepageAffiliateCta } from '../lib/affiliate-html.js';
+
+const { sourcePath, affiliatePlacement } = Astro.props;
+const source = fs.readFileSync(path.resolve(process.cwd(), sourcePath), 'utf8');
+const head = source.match(/<head>([\s\S]*?)<\/head>/i)?.[1] || '';
+let body = source.match(/<body>([\s\S]*?)<\/body>/i)?.[1] || '';
+
+if (affiliatePlacement === 'homepage') {
+  body = body.replace('<div id="affiliate-home-cta"></div>', renderHomepageAffiliateCta());
+  body = body.replace(/\s*<script type="module">[\s\S]*?renderHomepageAffiliateCta[\s\S]*?<\/script>/, '');
+}
+
+if (affiliatePlacement === 'guide') {
+  body = body.replace('<div id="affiliate-products"></div>', renderBuyingGuideAffiliateProducts());
+  body = body.replace(/\s*<script type="module">[\s\S]*?renderBuyingGuideAffiliateProducts[\s\S]*?<\/script>/, '');
+}
+---
+
+<!doctype html>
+<html lang="es">
+  <head><Fragment set:html={head} /></head>
+  <body><Fragment set:html={body} /></body>
+</html>
